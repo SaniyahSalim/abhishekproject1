@@ -1,0 +1,57 @@
+.loader-container {
+  position: relative;
+  width: 140px;
+  height: 140px;
+}
+
+.cross {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 60px;
+  background: #00bfa5; /* subtle green */
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 5px #00bfa5, 0 0 10px #00bfa5;
+  animation: pulseCross 1.2s infinite;
+}
+
+.cross::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: -20px;
+  width: 60px;
+  height: 20px;
+  background: #00bfa5;
+  box-shadow: 0 0 5px #00bfa5, 0 0 10px #00bfa5;
+}
+
+.ecg-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 140px;
+  height: 140px;
+  border: 2px solid #00bfa5;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) rotate(0deg);
+  animation: rotateCircle 2s linear infinite;
+  box-shadow: 0 0 3px #00bfa5, 0 0 6px #00bfa5;
+}
+
+@keyframes pulseCross {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 5px #00bfa5, 0 0 10px #00bfa5;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    box-shadow: 0 0 8px #00bfa5, 0 0 15px #00bfa5;
+  }
+}
+
+@keyframes rotateCircle {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
