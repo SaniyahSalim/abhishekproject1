@@ -11,13 +11,14 @@ from app.db.session import get_db
 
 load_dotenv()
 
-SECRET_KEY=os.getenv("SECRET_KEY","67HJ5V5J5T78R4HV5JHT5745JHV55654U65J6V667")
-ALGORITHM=os.getenv("ALGORITHM","HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES=os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES","30")
+SECRET_KEY=os.getenv("SECRET_KEY")
+print("secret key", SECRET_KEY)
+ALGORITHM=os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES=os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 def hash_password(password:str) -> str:
     return pwd_context.hash(password)
@@ -35,3 +36,19 @@ def create_access_token(data:dict, expires_delta:timedelta | None = None) -> str
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=401, detail="Could not validate credentials"
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+    user = db.query(User).filter(User.email == email).first()
+    if user is None:
+        raise credentials_exception
+    return user

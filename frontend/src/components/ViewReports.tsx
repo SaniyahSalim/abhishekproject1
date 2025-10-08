@@ -10,10 +10,10 @@ import {
   Typography,
   Button,
   Box,
-  CircularProgress,
 } from "@mui/material";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useParams, useNavigate } from "react-router-dom";
+import HealthcareLoader from "./HealthcareLoader";
 
 interface Report {
   id: number;
@@ -22,8 +22,10 @@ interface Report {
   uploaded_at: string | null;
 }
 
+const API_BASE = "http://127.0.0.1:8000";
+
 const ViewReports: React.FC = () => {
-  const { patientId } = useParams(); 
+  const { patientId } = useParams();
   const navigate = useNavigate();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,8 +33,23 @@ const ViewReports: React.FC = () => {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/reports/patient/${patientId}`);
+        const token = localStorage.getItem("token"); // ✅ get token from localStorage
+        if (!token) {
+          console.error("No token found. Please log in.");
+          navigate("/login"); // redirect if not logged in
+          return;
+        }
+
+        const res = await fetch(`${API_BASE}/reports/patient/${patientId}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
         if (!res.ok) throw new Error("Failed to fetch reports");
+
         const data = await res.json();
         setReports(data);
       } catch (error) {
@@ -43,7 +60,7 @@ const ViewReports: React.FC = () => {
     };
 
     fetchReports();
-  }, [patientId]);
+  }, [patientId, navigate]);
 
   const handleViewResult = (reportId: number) => {
     navigate(`/results/${patientId}/${reportId}`);
@@ -51,13 +68,15 @@ const ViewReports: React.FC = () => {
 
   return (
     <Box sx={{ p: 3, backgroundColor: "#DBE2EF", minHeight: "100vh" }}>
-         <Button
-                  variant="contained"
-                  color="primary"
-                  startIcon={<ArrowBackIcon />}
-                  sx={{ position: "absolute", left: 3, top: 25 }}
-                  onClick={() => navigate(-1)}
-                ></Button>
+      {/* Back Button */}
+      <Button
+        variant="contained"
+        color="primary"
+        startIcon={<ArrowBackIcon />}
+        sx={{ position: "absolute", left: 3, top: 25 }}
+        onClick={() => navigate(-1)}
+      ></Button>
+
       <Typography
         variant="h4"
         align="center"
@@ -68,24 +87,34 @@ const ViewReports: React.FC = () => {
         Patient Reports
       </Typography>
 
-
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
-          <CircularProgress />
+          <HealthcareLoader />
         </Box>
       ) : reports.length === 0 ? (
         <Typography align="center" color="text.secondary">
           No reports available for this patient.
         </Typography>
       ) : (
-        <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: 4, backgroundColor:"#F9F7F7" }}>
+        <TableContainer
+          component={Paper}
+          sx={{ borderRadius: 3, boxShadow: 4, backgroundColor: "#F9F7F7" }}
+        >
           <Table>
-            <TableHead sx={{backgroundColor:"#112D4E"}}>
+            <TableHead sx={{ backgroundColor: "#112D4E" }}>
               <TableRow sx={{ backgroundColor: "#3F72AF" }}>
-                <TableCell sx={{ color: "white", fontWeight: "bold" }}>ID</TableCell>
-                <TableCell sx={{ color: "white", fontWeight: "bold" }}>File Name</TableCell>
-                <TableCell sx={{ color: "white", fontWeight: "bold" }}>Uploaded At</TableCell>
-                <TableCell sx={{ color: "white", fontWeight: "bold" }}>Action</TableCell>
+                <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                  ID
+                </TableCell>
+                <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                  File Name
+                </TableCell>
+                <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                  Uploaded At
+                </TableCell>
+                <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                  Action
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -94,14 +123,20 @@ const ViewReports: React.FC = () => {
                   <TableCell>{report.id}</TableCell>
                   <TableCell>{report.file_path.split("/").pop()}</TableCell>
                   <TableCell>
-                    {report.uploaded_at ? new Date(report.uploaded_at).toLocaleString() : "N/A"}
+                    {report.uploaded_at
+                      ? new Date(report.uploaded_at).toLocaleString()
+                      : "N/A"}
                   </TableCell>
                   <TableCell>
                     <Button
                       variant="contained"
                       color="primary"
                       onClick={() => handleViewResult(report.id)}
-                      sx={{ borderRadius: 2, fontWeight: "bold",backgroundColor:"#3F72AF" }}
+                      sx={{
+                        borderRadius: 2,
+                        fontWeight: "bold",
+                        backgroundColor: "#3F72AF",
+                      }}
                     >
                       View Result
                     </Button>

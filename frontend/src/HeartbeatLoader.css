@@ -1,57 +1,53 @@
-.loader-container {
+.ecg-loader-overlay {
+  position: fixed;      /* Covers the entire screen */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* background: rgba(255, 255, 255, 0.3); Transparent overlay */
+  background: rgba(8, 8, 8, 0.132); /* Transparent overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;        /* Always on top */
+}
+
+.heart-rate {
+  width: 150px;
+  height: 73px;
   position: relative;
-  width: 140px;
-  height: 140px;
 }
 
-.cross {
+.heart-rate .fade-in,
+.heart-rate .fade-out {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 20px;
-  height: 60px;
-  background: #00bfa5; /* subtle green */
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 5px #00bfa5, 0 0 10px #00bfa5;
-  animation: pulseCross 1.2s infinite;
+  height: 100%;
+  top: 0;
+  background-color: rgba(255, 255, 255, 0.3); /* Matches overlay transparency */
 }
 
-.cross::before {
-  content: '';
-  position: absolute;
-  top: 20px;
-  left: -20px;
-  width: 60px;
-  height: 20px;
-  background: #00bfa5;
-  box-shadow: 0 0 5px #00bfa5, 0 0 10px #00bfa5;
+.heart-rate .fade-in {
+  width: 100%;
+  right: 0;
+  animation: heartRateIn 2.5s linear infinite;
 }
 
-.ecg-circle {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 140px;
-  height: 140px;
-  border: 2px solid #00bfa5;
-  border-radius: 50%;
-  transform: translate(-50%, -50%) rotate(0deg);
-  animation: rotateCircle 2s linear infinite;
-  box-shadow: 0 0 3px #00bfa5, 0 0 6px #00bfa5;
+.heart-rate .fade-out {
+  width: 120%;
+  right: -120%;
+  animation: heartRateOut 2.5s linear infinite;
 }
 
-@keyframes pulseCross {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-    box-shadow: 0 0 5px #00bfa5, 0 0 10px #00bfa5;
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.2);
-    box-shadow: 0 0 8px #00bfa5, 0 0 15px #00bfa5;
-  }
+/* Keyframes for fade-in effect */
+@keyframes heartRateIn {
+  0% { width: 100%; }
+  50% { width: 0; }
+  100% { width: 0; }
 }
 
-@keyframes rotateCircle {
-  0% { transform: translate(-50%, -50%) rotate(0deg); }
-  100% { transform: translate(-50%, -50%) rotate(360deg); }
+/* Keyframes for fade-out effect */
+@keyframes heartRateOut {
+  0% { left: -120%; }
+  30% { left: -120%; }
+  100% { left: 0; }
 }

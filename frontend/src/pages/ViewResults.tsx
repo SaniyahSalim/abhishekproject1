@@ -5,7 +5,6 @@ import {
   Card,
   CardContent,
   Box,
-  CircularProgress,
   Button,
   Dialog,
   DialogTitle,
@@ -15,6 +14,7 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CloseIcon from "@mui/icons-material/Close";
 import PatientHistoryCharts from "../components/PatientHistoryCharts";
+import HealthcareLoader from "../components/HealthcareLoader";
 
 interface ResultProps {
   parameter: string;
@@ -37,7 +37,19 @@ const ViewResults = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/reports/results/${reportId}`)
+
+     const token = localStorage.getItem("token"); // ✅ get token from localStorage
+        if (!token) {
+          console.error("No token found. Please log in.");
+          navigate("/login"); // redirect if not logged in
+          return;
+        }
+
+    fetch(`http://127.0.0.1:8000/reports/results/${reportId}`,{method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },})
       .then((response) => response.json())
       .then((data) => {
         setResults(data);
@@ -52,7 +64,7 @@ const ViewResults = () => {
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" mt={5}>
-        <CircularProgress />
+        <HealthcareLoader/>
       </Box>
     );
   }

@@ -16,9 +16,11 @@ import loginImage from "../assets/loginImage.png";
 import { Email, Lock, Person } from "@mui/icons-material";
 import { useAuth } from "../ContextApi/Auth";
 import { useNavigate } from "react-router-dom";
+import HealthcareLoader from "../components/HealthcareLoader";
 
 const AuthPage: React.FC = () => {
   const [tab, setTab] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -57,7 +59,7 @@ const AuthPage: React.FC = () => {
         showNotification("⚠️ Please enter both email and password.", "warning");
         return;
       }
-
+      setLoading(true);
       try {
         const response = await fetch("http://127.0.0.1:8000/auth/login", {
           method: "POST",
@@ -68,6 +70,7 @@ const AuthPage: React.FC = () => {
         });
 
         if (response.ok) {
+          setLoading(false);
           const data = await response.json();
           login(data.access_token);
           showNotification("✅ Login successful!", "success");
@@ -91,7 +94,7 @@ const AuthPage: React.FC = () => {
         showNotification("⚠️ Please enter both email and password.", "warning");
         return;
       }
-
+      setLoading(true);
       try {
         const response = await fetch("http://127.0.0.1:8000/auth/signup", {
           method: "POST",
@@ -102,6 +105,7 @@ const AuthPage: React.FC = () => {
         });
 
         if (response.ok) {
+          setLoading(false)
           await response.json();
           showNotification("✅ Signup successful! Please login.", "success");
           setTimeout(() => setTab(0), 1500);
@@ -122,7 +126,8 @@ const AuthPage: React.FC = () => {
       display="flex"
       minHeight="100vh"
       sx={{ background: "linear-gradient(to right,rgb(26, 123, 241) , #F9F7F7)" }}
-    >
+    > 
+    {loading && <HealthcareLoader/>}
       {/* Left Section with Illustration */}
       <Box
         flex={1}

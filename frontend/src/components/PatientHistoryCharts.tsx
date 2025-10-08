@@ -38,10 +38,14 @@ const PatientHistoryCharts: React.FC<PatientHistoryChartsProps> = ({
 }) => {
   const [history, setHistory] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
-
+  
   useEffect(() => {
     axios
-      .get<Report[]>(`http://localhost:8000/reports/history/${patientId}/results`)
+      .get<Report[]>(`http://localhost:8000/reports/history/${patientId}/results`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
       .then((res) => {
         setHistory(res.data);
         setLoading(false);
